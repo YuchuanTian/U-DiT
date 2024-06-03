@@ -331,7 +331,7 @@ class FeedForward(nn.Module):
     
 
     def forward(self, x):
-        if self.training:
+        if (not self.rep) or (self.rep and self.training): # debugged: 2024/6/4
             x = self.project_in(x)
             x = F.gelu(x)
             if self.rep:
@@ -341,8 +341,9 @@ class FeedForward(nn.Module):
             else:
                 out = self.dwconv(x)
             x = self.project_out(out)
-        else: # eval
+        else: # eval & rep
             x = F.conv2d(x, self.project_in_weight, self.project_in_bias) # project_in
+            x = F.gelu(x) # debugged: 2024/6/4
             x = F.conv2d(x, self.dwconv_weight, self.dwconv_bias, padding=2, groups=self.hidden_features)
             x = F.conv2d(x, self.project_out_weight, self.project_out_bias) # project_out
 

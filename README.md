@@ -7,7 +7,10 @@
     <img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-blue" /></a>
 <a href="https://www.modelscope.cn/models/YuchuanTian/U-DiT/files" alt="ModelScope Models">
     <img src="https://img.shields.io/badge/ModelScope-Models-blue" /></a>
+<a href="https://colab.research.google.com/drive/17ZimD7GdK2ZZHRg52_I9PNxDTs0LKd20?usp=sharing" alt="ModelScope Models">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
 </p>
+
 
 This is the official implementation of ["U-DiTs: Downsample Tokens in U-Shaped Diffusion Transformers"](https://arxiv.org/abs/2405.02730).
 
@@ -33,11 +36,10 @@ Please run command ```pip install -r requirements.txt``` to install the supporti
 
 ## Training
 
-Here we provide a brief tutorial on training a U-DiT model.
+Here we provide two ways to train a U-DiT model: 1. train on the original ImageNet dataset; 2. train on preprocessed VAE features (Recommended).
 
 **Training Data Preparation**
-
-Firstly, download ImageNet as follows:
+Use the original ImageNet dataset + VAE encoder. Firstly, download ImageNet as follows:
 
 
 ```
@@ -64,6 +66,22 @@ torchrun --nnodes=1 --nproc_per_node=8 train.py --data-path={path to imagenet/tr
 accelerate launch --mixed_precision fp16 train_accelerate.py --data-path {path to imagenet/train} --image-size=256 --model={model name} --epochs={iteration//5000} # fp16 Training
 ```
 
+**Training Feature Preparation (RECOMMENDED)**
+
+Following Fast-DiT, it is recommended to load VAE features directly for faster training. You don't need to download the enormous ImageNet dataset (> 100G); instead, a much smaller "VAE feature" dataset (~21G for ImageNet 256x256) is available here on [HuggingFace](https://huggingface.co/datasets/yuchuantian/imagenet_vae_256) and [MindScope](https://www.modelscope.cn/models/YuchuanTian/imagenet_vae_256/). Please do the following steps:
+
+1. Download [imagenet_feature.tar](https://huggingface.co/datasets/yuchuantian/imagenet_vae_256/blob/main/imagenet_feature.tar)
+
+2. Unzip the tar ball by running ```tar -xf imagenet_feature.tar```
+
+```
+imagenet_feature/
+├── imagenet256_features/ # VAE features
+└── imagenet256_labels/ # labels
+```
+
+3. Append parser ```--feature-path={path to imagenet_feature}``` to the training command.
+
 ## Inference
 
 #### Weights Available
@@ -75,7 +93,7 @@ accelerate launch --mixed_precision fp16 train_accelerate.py --data-path {path t
 Run the following command for parallel sampling:
 
 ```bash
-torch --nnodes=1 --nproc_per_node=8 sample_ddp.py --ckpt={path to checkpoint} --image-size=256 --model={model name} --epochs={iteration//5000} --cfg-scale={cfg scale}
+torch --nnodes=1 --nproc_per_node=8 sample_ddp.py --ckpt={path to checkpoint} --image-size=256 --model={model name} --cfg-scale={cfg scale}
 ```
 
 After sampling, an .npz file that contains 50000 images is automatically generated.
@@ -92,7 +110,8 @@ python evaluator.py {path to reference batch} {path to generated .npz}
 
 - [x] Training code for U-DiTs
 - [x] Model weights
-- [ ] ImageNet features from VAE for faster training
+- [x] ImageNet features from VAE for faster training
+- [x] [Colab demos](https://colab.research.google.com/drive/17ZimD7GdK2ZZHRg52_I9PNxDTs0LKd20?usp=sharing)
 - [ ] Outcomes from longer training
 
 ## BibTex Formatted Citation

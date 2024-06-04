@@ -300,7 +300,7 @@ class FeedForward(nn.Module):
 
         self.dwconv_weight = self.dwconv[0].weight.detach()
         self.dwconv_weight[:, :, 1:4, 1:4] += self.dwconv[1].weight.detach()
-        self.dwconv_weight[:, :, 2:3, 2:3] += self.dwconv[2].weight.detach()
+        self.dwconv_weight[:, :, 2:3, 2:3] += (self.dwconv[2].weight.detach() + 1.) # skip connection
         
         self.dwconv_bias = None
         if self.bias:

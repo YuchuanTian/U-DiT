@@ -185,7 +185,6 @@ class DownSample_Attn(nn.Module):
         # v2
         self.attn_type = attn_type
         if attn_type == 'v2':
-            # print('Global Attention type v2...')
             self.logit_scale = nn.Parameter(torch.log(10 * torch.ones((num_heads, 1, 1))), requires_grad=True)
 
         # posemb
@@ -510,11 +509,11 @@ class U_DiTBlock(nn.Module):
         )
 
     def forward(self, x, c):
-        # global attention
+
         shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = self.adaLN_modulation1(c).chunk(6, dim=1)
         x = x + gate_msa.unsqueeze(-1).unsqueeze(-1) * self.attn1(modulate(self.norm11(x), shift_msa, scale_msa))
         x = x + gate_mlp.unsqueeze(-1).unsqueeze(-1) * self.mlp1(modulate(self.norm21(x), shift_mlp, scale_mlp))
-        # local attention
+
         shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = self.adaLN_modulation2(c).chunk(6, dim=1)
         x = x + gate_msa.unsqueeze(-1).unsqueeze(-1) * self.attn2(modulate(self.norm12(x), shift_msa, scale_msa))
         x = x + gate_mlp.unsqueeze(-1).unsqueeze(-1) * self.mlp2(modulate(self.norm22(x), shift_mlp, scale_mlp))

@@ -14,7 +14,9 @@
 
 This is the official implementation of ["U-DiTs: Downsample Tokens in U-Shaped Diffusion Transformers"](https://arxiv.org/abs/2405.02730).
 
-9/26/2024: U-DiT is accepted to **NeurIPS 2024**!🎉🎉🎉
+9/30/2024: U-DiT is cited by **[Playground V3](https://arxiv.org/abs/2409.10695)**!
+
+9/26/2024: U-DiT is accepted to **NeurIPS 2024**!🎉🎉🎉 See you in Vancouver!
 
 ![scheme](imgs/scheme.png)
 
